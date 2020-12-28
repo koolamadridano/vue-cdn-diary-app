@@ -1,30 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Reynan lauron's Diary Entry Web Application">
-    <title>Sign in</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="../app.css">
+    <title>Create a new account</title>
 </head>
-
 <body>
     <div id="app">
         <div class="container">
             <div class="row justify-content-center mt-5">
                 <div class="col-xl-3 col-lg-6 col-md-8 col-sm-12 col-xs-8 mt-5">
                     <h1 class="display-5 mt-5">{{title}}</h1>
-                    <!-- Input fields goes here -->
-                   <form @submit.prevent="login">
+                    <form @submit.prevent="register">
                         <input 
                             v-model="loginPayload.username"
                             class="form-control mt-3" 
                             type="text" 
-                            placeholder="username" 
+                            placeholder="Username" 
                             aria-label="default input example" required>
                         <input 
                             v-model="loginPayload.password"
@@ -32,24 +28,25 @@
                             type="password" 
                             placeholder="Password"
                             aria-label="default input example" required>
-                        
+                        <input 
+                            v-model="loginPayload.passwordIsMatched"
+                            class="form-control mt-2" 
+                            type="password" 
+                            placeholder="Confirm password"
+                            aria-label="default input example" required>
+
                         <div class="uk-alert-danger d-flex justify-content-between align-items-center p-2 m-2 pointer" uk-alert v-if="loginPayload.isError">
                             <h6 class="text-danger p-0 m-0">{{loginPayload.message}}</h6>
                             <span uk-icon="icon: close" @click="loginPayload.isError = false"></span>
                         </div>
+
                         <!-- Button goes here -->
                         <div class="d-grid gap-2 mt-2">
-                            <button type="submit" class="uk-button uk-button-primary">
-                               <div class="d-flex justify-content-center align-items-center">
-                                    <div>Login&nbsp;</div>
-                                    <i class="fas fa-spinner fa-spin" v-if="loginPayload.loading"></i>
-                                    <span uk-icon="icon: sign-in" v-else></span>
-                               </div>
-                            </button>
+                            <button type="submit" class="uk-button uk-button-primary">Create</button>
                         </div>
                         <div class="d-grid gap-2 mt-2">
-                            <button type="button" class="uk-button uk-button-default" @click="redirectToFeed">Create new account</button>
-                        </div> 
+                            <button type="button" class="uk-button uk-button-default" @click="redirectToFeed">Sign in instead</button>
+                        </div>
                    </form>
                 </div>
             </div>
@@ -64,36 +61,38 @@
         var app = new Vue({
             el: '#app',
             data: {
-                title: 'Diary.me',
+                title: 'Sign up',
                 baseURL: 'https://www.diary-api.somee.com/',
                 appId: 'diaryAppWebTech',
                 loginPayload: {
                     username: null,
                     password: null,
                     isError: false,
+                    passwordIsMatched: null,
                     message: null,
-                    loading: null
                 },
                 user: {} 
             },
             methods: {
                 redirectToFeed: function() {
-                    location.href = 'content/registration.html';
+                    location.href = '../index.html';
                 },
-                login: async function() {
-                this.loginPayload.loading = true;
-                   await axios.post(`${this.baseURL}TOKEN?username=${this.loginPayload.username}&password=${this.loginPayload.password}`)
-                        .then(res => {
-                            if(res.data.token) {
-                                this.loginPayload = { ...null, loading: false};
-                                this.user = res.data;
-                                localStorage.setItem(this.appId, JSON.stringify(res.data));
-                                location.href = 'content/profile.html';
-                            }
+                register: async function() {
+                    if(this.loginPayload.password === this.loginPayload.passwordIsMatched) {
+                        let payload = {
+                        username: this.loginPayload.username,
+                        password: this.loginPayload.password,
+                        role: "allow",
+                        firstName: "allow",
+                        lastName: "allow"
+                    }
+                   await axios.post(`${this.baseURL}api/account/register`, payload)
+                        .then(res =>  {
+                            console.log(res.data);
+                            location.href = '../index.html'
                         })
                         .catch(err => {
                             console.log(err.response);
-                            this.loginPayload = { ...null, loading: false};
                             if(err.response.status === 400) {
                                 this.loginPayload = {
                                     isError: true,
@@ -101,6 +100,14 @@
                                 }
                             }
                         });
+                    } else {
+                        this.loginPayload = {
+                            ...null,
+                            isError: true,
+                            message: "Password does not match"
+                        }
+                    }
+                 
                 }
             },
             mounted: function() {
@@ -111,5 +118,4 @@
         })
     </script>
 </body>
-
 </html>

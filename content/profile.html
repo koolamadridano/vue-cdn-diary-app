@@ -49,12 +49,40 @@
                         </ul>
                     </div>
                 </div>
-                <h4 class="font-weight-light mt-1">
+                <h4 class="font-weight-light mt-1 uk-text-break">
                     {{user[0]?.shortDescription}}
                 </h4>
                 <iframe id="profileVideo" width="100%" height="345" src="" frameborder="0" scrolling="no"  uk-responsive uk-video="automute: true"></iframe>
 
-                <button class="uk-button uk-button-primary mt-5">WRITE NEW POST</button>
+                <button class="uk-button uk-button-primary mt-5" @click="redirectToPostPage">write diary</button>
+                <button class="uk-button uk-button-default mt-5" @click="redirectToFeed">feed</button>
+
+                <div v-if="diaries.length > 0">
+                    <div v-for="(data, index) in diaries" class="mt-5">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="p-0 m-0">
+                                <div class="d-flex align-items-center">
+                                    <span uk-icon="icon: hashtag"></span> 
+                                    <span><b>{{data.category}}</b></span>
+                                </div>
+                            </h6>
+                            <h6 class="p-0 m-0"> 
+                                <div class="d-flex align-items-center">
+                                    <span uk-icon="icon: calendar"></span> 
+                                    <span>&nbsp;{{data.datePosted}}</span>
+                                </div>
+                            </h6>
+                        </div>
+                        <p>{{data.content}}</p>
+                    </div>
+                </div>
+                <div v-else>
+                    <h4 class="text-center mt-5 blockquote"><em>Oops! It sounds like you don't have any posts, <br>Do you wish to 
+                        <b @click="redirectToPostPage" class="pointer">write</b> your first diary?</em>
+                    </h4>
+                </div>
+                <div style="margin-top: 100px"></div>
+                <p class="text-center">&copy; KOLYA MADRIDANO</p>
             </div>
         </div>
     </div>
@@ -73,24 +101,34 @@
                 title: 'Diary.me',
                 baseURL: 'https://www.diary-api.somee.com/',
                 user: {},
+                diaries: [],
+                local: null
             },
             methods: {
                 logout: function(){ 
                     localStorage.removeItem('diaryAppWebTech');
                     this.componentDidMount();
                 }, 
+                redirectToPostPage: function() {
+                    return location.href = "../content/post.html";
+                },
+                redirectToFeed: function() {
+                    return location.href = "../content/timeline.html";
+                },
+                fetchPostedDiaries: async function() {
+                    await axios.get(this.baseURL+`api/diary/findBySpecialId/${this.local?.userId}`)
+                        .then(res =>  this.diaries = res.data.reverse())
+                        .catch(err => console.error(err))
+                },
                 componentDidMount: function() {
                     if(localStorage.diaryAppWebTech) {
-                        let local = JSON.parse(localStorage.diaryAppWebTech);
-                        if(local.userId) {
-                            axios.get(`${this.baseURL}api/profile/findBySpecialId/${local.userId}`)
+                        if(this.local.userId) {
+                            axios.get(`${this.baseURL}api/profile/findBySpecialId/${this.local?.userId}`)
                             .then(res => {
                                 this.user = res.data;
                                 if(this.user.length == 0) return location.href = "../content/editprofile.html";
-
                                 //change title
                                 document.title = this.user[0]?.firstName + " " + this.user[0]?.lastName;
-                                console.log(this.user[0]);
                                 //load video
                                 let youtubeVideoUrl = this.user[0]?.media.video;
                                 let youtubeVideoId = youtubeVideoUrl?.slice(youtubeVideoUrl.indexOf("?v=") + 3);
@@ -103,6 +141,8 @@
                 }
             },
             mounted:  function() {
+                this.local =  JSON.parse(localStorage.diaryAppWebTech);
+                this.fetchPostedDiaries();
                 this.componentDidMount();
             }
         })
