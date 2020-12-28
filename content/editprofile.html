@@ -29,7 +29,7 @@
                         <div class="row mt-5">
                             <div class="col">
                                 <input 
-                                    v-model="firstName"
+                                    v-model="editProfilePayload.firstName"
                                     type="text" 
                                     class="form-control" 
                                     placeholder="First name"
@@ -37,7 +37,7 @@
                             </div>
                             <div class="col">
                                 <input 
-                                    v-model="lastName"
+                                    v-model="editProfilePayload.lastName"
                                     type="text" 
                                     class="form-control" 
                                     placeholder="Last name"
@@ -45,16 +45,17 @@
                             </div>
                         </div>
 
-                        <input 
+                        <input                  
+                            v-model="editProfilePayload.course"
                             type="text" 
                             class="form-control mt-2" 
-                            placeholder="Course"
+                            placeholder="Course (Do not abbreviate)"
                             aria-describedby="Course" required>
 
                         <div class="row mt-2">
                             <div class="col">
                                 <input 
-                                    v-model="country"
+                                    v-model="editProfilePayload.country"
                                     type="text" 
                                     class="form-control" 
                                     placeholder="Country"
@@ -62,7 +63,7 @@
                             </div>
                             <div class="col">
                                 <input 
-                                    v-model="city"
+                                    v-model="editProfilePayload.city"
                                     type="text" 
                                     class="form-control" 
                                     placeholder="City/Town"
@@ -71,14 +72,14 @@
                         </div>
 
                         <textarea 
-                            v-model="shortDescription"
+                            v-model="editProfilePayload.shortDescription"
                             class="form-control mt-2" 
                             id="exampleFormControlTextarea1"
                             rows="5" 
                             placeholder="Describe yourself" required></textarea>
 
                         <input 
-                            v-model="video"
+                            v-model="editProfilePayload.video"
                             type="text" 
                             class="form-control mt-2" 
                             placeholder="YouTube video link"
@@ -103,39 +104,43 @@
     <script>
          var app = new Vue({
             el: '#app',
+            local: null,
             data: {
                 title: 'Diary.me',
                 baseURL: 'https://diary-app-api.somee.com/',
                 user: {},
 
                 toggleLoader: false,
-
-                specialId: null,
-                firstName: null,
-                lastName:null,
-                shortDescription: null,
-                country: null,
-                city: null,
-                music: null,
-                video: null,
-                birthDate: null
+                editProfilePayload: {
+                    specialId: null,
+                    firstName: null,
+                    lastName:null,
+                    shortDescription: null,
+                    country: null,
+                    city: null,
+                    music: null,
+                    video: null,
+                    birthDate: null
+                }
                 
             },
             methods: {
                 saveProfile: function() {
                     this.toggleLoader = true;
+                    this.editProfilePayload.specialId =  this.local.userId
                     let payload = {
-                        specialId: this.specialId,
-                        firstName: this.firstName,
-                        lastName: this.lastName,
-                        shortDescription: this.shortDescription,
+                        specialId: this.seditProfilePayload.pecialId,
+                        firstName: this.editProfilePayload.firstName,
+                        course: this.editProfilePayload.course,
+                        lastName: this.editProfilePayload.lastName,
+                        shortDescription: this.editProfilePayload.shortDescription,
                         address: {
-                            country: this.country,
-                            city: this.city
+                            country: this.editProfilePayload.country,
+                            city: this.editProfilePayload.city
                         },
                         media: {
-                            music: this.music,
-                            video: this.video
+                            music: this.editProfilePayload.music,
+                            video: this.editProfilePayload.video
                         }
                     }
                     axios.post('https://www.diary-api.somee.com/api/profile/create', payload)
@@ -147,9 +152,8 @@
                 }
             },
             mounted:  async function() {
-                let local = JSON.parse(localStorage.diaryAppWebTech);
-                this.specialId =  local.userId
-               if(!localStorage.diaryAppWebTech) return location.href = "../index.html";
+                if(localStorage.diaryAppWebTech)  this.local = JSON.parse(localStorage.diaryAppWebTech);
+                if(!this.local) return location.href = '../index.html';
             }
         })
     </script>

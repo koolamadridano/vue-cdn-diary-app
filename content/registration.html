@@ -17,27 +17,27 @@
                     <h1 class="display-5 mt-5">{{title}}</h1>
                     <form @submit.prevent="register">
                         <input 
-                            v-model="loginPayload.username"
+                            v-model="registerPayload.username"
                             class="form-control mt-3" 
                             type="text" 
                             placeholder="Username" 
                             aria-label="default input example" required>
                         <input 
-                            v-model="loginPayload.password"
+                            v-model="registerPayload.password"
                             class="form-control mt-2" 
                             type="password" 
                             placeholder="Password"
                             aria-label="default input example" required>
                         <input 
-                            v-model="loginPayload.passwordIsMatched"
+                            v-model="registerPayload.passwordIsMatched"
                             class="form-control mt-2" 
                             type="password" 
                             placeholder="Confirm password"
                             aria-label="default input example" required>
 
-                        <div class="uk-alert-danger d-flex justify-content-between align-items-center p-2 m-2 pointer" uk-alert v-if="loginPayload.isError">
-                            <h6 class="text-danger p-0 m-0">{{loginPayload.message}}</h6>
-                            <span uk-icon="icon: close" @click="loginPayload.isError = false"></span>
+                        <div class="uk-alert-danger d-flex justify-content-between align-items-center p-2 m-2 pointer" uk-alert v-if="registerPayload.isError">
+                            <h6 class="text-danger p-0 m-0">{{registerPayload.message}}</h6>
+                            <span uk-icon="icon: close" @click="registerPayload.isError = false"></span>
                         </div>
 
                         <!-- Button goes here -->
@@ -63,8 +63,7 @@
             data: {
                 title: 'Sign up',
                 baseURL: 'https://www.diary-api.somee.com/',
-                appId: 'diaryAppWebTech',
-                loginPayload: {
+                registerPayload: {
                     username: null,
                     password: null,
                     isError: false,
@@ -78,42 +77,36 @@
                     location.href = '../index.html';
                 },
                 register: async function() {
-                    if(this.loginPayload.password === this.loginPayload.passwordIsMatched) {
-                        let payload = {
-                        username: this.loginPayload.username,
-                        password: this.loginPayload.password,
+                    if(this.registerPayload.password === this.registerPayload.passwordIsMatched) {
+                    let payload = {
+                        username: this.registerPayload.username,
+                        password: this.registerPayload.password,
                         role: "allow",
                         firstName: "allow",
                         lastName: "allow"
                     }
                    await axios.post(`${this.baseURL}api/account/register`, payload)
-                        .then(res =>  {
-                            console.log(res.data);
-                            location.href = '../index.html'
-                        })
+                        .then(res =>  location.href = '../index.html')
                         .catch(err => {
                             console.log(err.response);
                             if(err.response.status === 400) {
-                                this.loginPayload = {
+                                this.registerPayload = {
                                     isError: true,
                                     message: err.response.data.message
                                 }
                             }
                         });
                     } else {
-                        this.loginPayload = {
+                        this.registerPayload = {
                             ...null,
                             isError: true,
                             message: "Password does not match"
                         }
                     }
-                 
                 }
             },
             mounted: function() {
-                if(localStorage.diaryAppWebTech) {
-                    location.href = 'content/profile.html';
-                }
+                if(localStorage.diaryAppWebTech) location.href = '../content/profile.html';
             }
         })
     </script>

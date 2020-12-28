@@ -25,7 +25,7 @@
                 <div class="d-flex justify-content-between align-items-center boundary">
                     <div>
                         <h1 class="font-weight-light p-0 m-0">{{user[0]?.firstName}} {{user[0]?.lastName}}</h1>
-                        <span class="text-secondary p-0 m-0">{{user[0]?.address?.country}}, {{user[0]?.address?.city}}</span>
+                        <span class="text-secondary p-0 m-0">{{user[0]?.address?.country}}, {{user[0]?.address?.city}}, Studying Information Technology</span>
                     </div>
                     <span uk-icon="icon: cog; ratio: 1.5" class="pointer "></span>
                     <div uk-dropdown="boundary: .boundary; mode: click; pos: bottom-center;" class="uk-box-shadow-xlarge">
@@ -90,16 +90,15 @@
    var app = new Vue({
             el: '#app',
             data: {
-                title: 'Diary.me',
                 baseURL: 'https://www.diary-api.somee.com/',
-                user: {},
                 diaries: [],
-                local: null
+                local: null,
+                user: []
             },
             methods: {
                 logout: function(){ 
                     localStorage.removeItem('diaryAppWebTech');
-                    this.componentDidMount();
+                    return location.href = "../index.html";
                 }, 
                 redirectToPostPage: function() {
                     return location.href = "../content/post.html";
@@ -107,34 +106,28 @@
                 redirectToFeed: function() {
                     return location.href = "../content/timeline.html";
                 },
-                fetchPostedDiaries: async function() {
-                    await axios.get(this.baseURL+`api/diary/findBySpecialId/${this.local?.userId}`)
-                        .then(res =>  this.diaries = res.data.reverse())
-                        .catch(err => console.error(err))
-                },
-                componentDidMount: function() {
-                    if(localStorage.diaryAppWebTech) {
-                        if(this.local.userId) {
-                            axios.get(`${this.baseURL}api/profile/findBySpecialId/${this.local?.userId}`)
+                componentDidMount: async function() {
+                    if(this.local.userId) {
+                        await axios.get(`${this.baseURL}api/profile/findBySpecialId/${this.local?.userId}`)
                             .then(res => {
                                 this.user = res.data;
                                 if(this.user.length == 0) return location.href = "../content/editprofile.html";
-                                //change title
                                 document.title = this.user[0]?.firstName + " " + this.user[0]?.lastName;
-                                //load video
+                                
                                 let youtubeVideoUrl = this.user[0]?.media.video;
                                 let youtubeVideoId = youtubeVideoUrl?.slice(youtubeVideoUrl.indexOf("?v=") + 3);
                                 document.getElementById('profileVideo').src = `https://www.youtube.com/embed/${youtubeVideoId}?loop=1&autoplay=1&mute=1`;
                             })
                             .catch(err => console.log(err));
-                        }
+                        await axios.get(this.baseURL+`api/diary/findBySpecialId/${this.local?.userId}`)
+                            .then(res =>  this.diaries = res.data.reverse())
+                            .catch(err => console.error(err))
                     }
-                if(!localStorage.diaryAppWebTech) return location.href = "../index.html";
                 }
             },
             mounted:  function() {
-                this.local =  JSON.parse(localStorage.diaryAppWebTech);
-                this.fetchPostedDiaries();
+                if(localStorage.diaryAppWebTech)  this.local = JSON.parse(localStorage.diaryAppWebTech);
+                if(!this.local) return location.href = '../index.html';
                 this.componentDidMount();
             }
         })

@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
     <link rel="stylesheet" href="../app.css">
-
-    <title>Document</title>
+    <title>Feed</title>
 </head>
     <div id="app">
         <div class="container">
@@ -53,7 +52,6 @@
             data: {
                 title: 'Diary.me',
                 baseURL: 'https://www.diary-api.somee.com/',
-                appId: 'diaryAppWebTech',
                 local: null,
                 diaries: []
             },
@@ -61,33 +59,24 @@
                 returnToProfile: function() {
                     location.href = '../content/profile.html';
                 },
-                fetchDiaries: async function() {
-                    await axios.get(this.baseURL+'api/diary/all')
-                        .then(res => {
-                            this.diaries = res.data.reverse(); 
-                            console.log(res.data)
-                        })
-                        .catch(err => console.error(err))
-                },
-                returnToProfile: function() {
-                    location.href = '../content/profile.html';
-                },
-                postDiary: function(){
-                    let payload = {
-                        specialId: this.local.userId,
-                        category: this.category,
-                        content: this.content.replace(/\n/g, " "),
-                        datePosted: Date.now()
+                componentDidMount: async function() {
+                    if(this.local.userId) {
+                        await axios.get(`${this.baseURL}api/profile/findBySpecialId/${this.local?.userId}`)
+                            .then(res => {
+                                this.user = res.data;
+                                document.title = this.user[0]?.firstName + " " + this.user[0]?.lastName ;
+                            })
+                            .catch(err => console.log(err));
+                        await axios.get(this.baseURL+'api/diary/all')
+                            .then(res => this.diaries = res.data.reverse())
+                            .catch(err => console.error(err))
                     }
-                    axios.post(this.baseURL+'api/diary/create', payload)
-                        .then(res => location.href = "../content/timeline.html")
-                        .catch(err => console.error(err));
                 }
             },
             mounted: function() {
-                //console.log(moment(Date.now()).add(24, 'hours').format('LLL'));
-                this.fetchDiaries();
-                this.local =  JSON.parse(localStorage.diaryAppWebTech);
+                if(localStorage.diaryAppWebTech)  this.local = JSON.parse(localStorage.diaryAppWebTech);
+                if(!this.local) return location.href = '../index.html';
+                this.componentDidMount();
             }
         })
     </script>

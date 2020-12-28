@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -66,7 +65,6 @@
             data: {
                 title: 'Diary.me',
                 baseURL: 'https://www.diary-api.somee.com/',
-                appId: 'diaryAppWebTech',
                 loginPayload: {
                     username: null,
                     password: null,
@@ -87,7 +85,7 @@
                             if(res.data.token) {
                                 this.loginPayload = { ...null, loading: false};
                                 this.user = res.data;
-                                localStorage.setItem(this.appId, JSON.stringify(res.data));
+                                localStorage.setItem("diaryAppWebTech", JSON.stringify(res.data));
                                 location.href = 'content/profile.html';
                             }
                         })
@@ -104,9 +102,7 @@
                 }
             },
             mounted: function() {
-                if(localStorage.diaryAppWebTech) {
-                    location.href = 'content/profile.html';
-                }
+                if(localStorage.diaryAppWebTech)  location.href = '../content/profile.html';
             }
         })
     </script>

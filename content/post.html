@@ -22,7 +22,7 @@
                     <form @submit.prevent="postDiary">
                         <div class="form-group mt-5">
                             <label class="mb-1 text-secondary">Select category</label>
-                            <select class="form-control"  v-model="category">
+                            <select class="form-control"  v-model="diaryPayload.category">
                                 <option value="Others">Others</option>
                                 <option value="Personal">Personal</option>
                                 <option value="School">School</option>
@@ -31,7 +31,7 @@
                         </div>
                         <label class="mt-3 mb-1 text-secondary">Message</label>
                         <textarea 
-                            v-model="content"
+                            v-model="diaryPayload.content"
                             class="form-control  mb-3" 
                             rows="10" 
                             placeholder="Write here..." required></textarea>
@@ -56,16 +56,11 @@
                 title: 'Diary.me',
                 baseURL: 'https://www.diary-api.somee.com/',
                 appId: 'diaryAppWebTech',
-                loginPayload: {
-                    username: null,
-                    password: null,
-                    isError: false,
-                    message: null,
-                },
-                user: {} ,
                 local: null,
-                category: null,
-                content: null
+                diaryPayload: {
+                    category: null,
+                    content: null
+                }
             },
              
             methods: {
@@ -75,8 +70,8 @@
                 postDiary: function(){
                     let payload = {
                         specialId: this.local.userId,
-                        category: this.category,
-                        content: this.content,
+                        category: this.diaryPayload.category,
+                        content: this.diaryPayload.content,
                         datePosted: moment(Date.now()).add(24, 'hours').format('LLL')
                     }
                     console.log(payload);
@@ -86,7 +81,8 @@
                 }
             },
             mounted: function() {
-                this.local =  JSON.parse(localStorage.diaryAppWebTech);
+                if(localStorage.diaryAppWebTech) this.local = JSON.parse(localStorage.diaryAppWebTech);
+                if(!this.local) return location.href = '../index.html';
             }
         })
     </script>
