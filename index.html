@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Reynan lauron's Diary Entry Web Application">
+    <title>Sign in</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-3 col-lg-6 col-md-8 col-sm-12 col-xs-8 mt-5">
+                    <h1 class="display-5 mt-5">{{title}}</h1>
+                    <!-- Input fields goes here -->
+                   <form @submit.prevent="login">
+                        <input 
+                            v-model="loginPayload.username"
+                            class="form-control mt-3" 
+                            type="text" 
+                            placeholder="username" 
+                            aria-label="default input example">
+                        <input 
+                            v-model="loginPayload.password"
+                            class="form-control mt-2" 
+                            type="password" 
+                            placeholder="Password"
+                            aria-label="default input example">
+                        <div class="uk-alert-danger d-flex justify-content-between align-items-center p-2 m-2" uk-alert v-if="loginPayload.isError">
+                            <h6 class="text-danger p-0 m-0">{{loginPayload.message}}</h6>
+                            <span uk-icon="icon: close; ratio: 1"></span>
+                        </div>
+                        <!-- Button goes here -->
+                        <div class="d-grid gap-2 mt-2">
+                            <button type="submit" class="uk-button uk-button-primary">Login</button>
+                        </div>
+                   </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Diary.me',
+                baseURL: 'https://www.diary-api.somee.com/',
+                appId: 'diaryAppWebTech',
+                loginPayload: {
+                    username: null,
+                    password: null,
+                    isError: false,
+                    message: null,
+                },
+                user: {} 
+            },
+            methods: {
+                login: async function() {
+                   await axios.post(`${this.baseURL}TOKEN?username=${this.loginPayload.username}&password=${this.loginPayload.password}`)
+                        .then(res => {
+                            if(res.data.token) {
+                                this.user = res.data;
+                                localStorage.setItem(this.appId, JSON.stringify(res.data));
+                                location.href = 'content/profile.html';
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err.response);
+                            if(err.response.status === 400) {
+                                this.loginPayload = {
+                                    isError: true,
+                                    message: err.response.data.message
+                                }
+                            }
+                        });
+                }
+            },
+            mounted: function() {
+                if(localStorage.diaryAppWebTech) {
+                    location.href = 'content/profile.html';
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

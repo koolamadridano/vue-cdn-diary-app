@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
+    <style>
+        .pointer { 
+            cursor: pointer;
+        }
+        .leave { 
+            font-size: 24px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+    <div class="container">
+        <div class="row mt-5 justify-content-center">   
+    
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center boundary">
+                    <div>
+                        <h1 class="font-weight-light p-0 m-0">{{user[0]?.firstName}} {{user[0]?.lastName}}</h1>
+                        <span class="text-secondary p-0 m-0">{{user[0]?.address?.country}}, {{user[0]?.address?.city}}</span>
+                    </div>
+                    <span uk-icon="icon: cog; ratio: 1.5" class="pointer "></span>
+                    <div uk-dropdown="boundary: .boundary; mode: click; pos: bottom-center;" class="uk-box-shadow-xlarge">
+                        <ul class="uk-nav uk-dropdown-nav">
+                            <li>
+                                <a href="#">
+                                    <div class="d-flex align-items-center">
+                                        <span uk-icon="icon: file-edit; ratio: 1"></span>
+                                        <span>Edit profile</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li @click="logout">
+                                <a href="#">
+                                    <div class="d-flex align-items-center">
+                                        <span uk-icon="icon: sign-out; ratio: 1"></span>
+                                        <span>Sign out</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <h4 class="font-weight-light mt-1">
+                    {{user[0]?.shortDescription}}
+                </h4>
+                <iframe id="profileVideo" width="100%" height="345" src="" frameborder="0" scrolling="no"  uk-responsive uk-video="automute: true"></iframe>
+
+                <button class="uk-button uk-button-primary mt-5">WRITE NEW POST</button>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+   var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Diary.me',
+                baseURL: 'https://www.diary-api.somee.com/',
+                user: {},
+            },
+            methods: {
+                logout: function(){ 
+                    localStorage.removeItem('diaryAppWebTech');
+                    this.componentDidMount();
+                }, 
+                componentDidMount: function() {
+                    if(localStorage.diaryAppWebTech) {
+                        let local = JSON.parse(localStorage.diaryAppWebTech);
+                        if(local.userId) {
+                            axios.get(`${this.baseURL}api/profile/findBySpecialId/${local.userId}`)
+                            .then(res => {
+                                this.user = res.data;
+                                if(this.user.length == 0) return location.href = "../content/editprofile.html";
+
+                                //change title
+                                document.title = this.user[0]?.firstName + " " + this.user[0]?.lastName;
+                                console.log(this.user[0]);
+                                //load video
+                                let youtubeVideoUrl = this.user[0]?.media.video;
+                                let youtubeVideoId = youtubeVideoUrl?.slice(youtubeVideoUrl.indexOf("?v=") + 3);
+                                document.getElementById('profileVideo').src = `https://www.youtube.com/embed/${youtubeVideoId}?loop=1&autoplay=1&mute=1`;
+                            })
+                            .catch(err => console.log(err));
+                        }
+                    }
+                if(!localStorage.diaryAppWebTech) return location.href = "../index.html";
+                }
+            },
+            mounted:  function() {
+                this.componentDidMount();
+            }
+        })
+</script>
+
+</html>

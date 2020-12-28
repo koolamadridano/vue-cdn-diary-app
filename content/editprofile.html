@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit profile to continue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="loader.css">
+    <style>
+        #box {
+            width:100px;
+  height:24px;
+  top:calc(50% - 24px / 2);
+  left:calc(50% - 100px / 2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <div class="container">
+            <div class="row mt-5 justify-content-center">
+                <div class="col-md-4">
+                    <h1 class="display-5">
+                        Edit profile
+                    </h1>
+                    <form @submit.prevent="saveProfile">
+                        <div class="row mt-5">
+                            <div class="col">
+                                <input 
+                                    v-model="firstName"
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="First name"
+                                    aria-describedby="First name" required>
+                            </div>
+                            <div class="col">
+                                <input 
+                                    v-model="lastName"
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="Last name"
+                                    aria-describedby="Last name" required>
+                            </div>
+                        </div>
+
+                        <input 
+                            type="text" 
+                            class="form-control mt-2" 
+                            placeholder="Course"
+                            aria-describedby="Course" required>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <input 
+                                    v-model="country"
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="Country"
+                                    aria-describedby="Country" required>
+                            </div>
+                            <div class="col">
+                                <input 
+                                    v-model="city"
+                                    type="text" 
+                                    class="form-control" 
+                                    placeholder="City/Town"
+                                    aria-describedby="City/Town" required>
+                            </div>
+                        </div>
+
+                        <textarea 
+                            v-model="shortDescription"
+                            class="form-control mt-2" 
+                            id="exampleFormControlTextarea1"
+                            rows="5" 
+                            placeholder="Describe yourself" required></textarea>
+
+                        <input 
+                            v-model="video"
+                            type="text" 
+                            class="form-control mt-2" 
+                            placeholder="YouTube video link"
+                            aria-describedby="Course" required>
+
+                        <div class="d-flex justify-content-end  mt-3">
+                            <button type="submit" class="btn btn-outline-primary">
+                                Save profile <i class="fas fa-spinner fa-spin ml-1" v-if="toggleLoader"></i>
+                            </button>
+                        </div>
+
+     
+                
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+         var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Diary.me',
+                baseURL: 'https://diary-app-api.somee.com/',
+                user: {},
+
+                toggleLoader: false,
+
+                specialId: null,
+                firstName: null,
+                lastName:null,
+                shortDescription: null,
+                country: null,
+                city: null,
+                music: null,
+                video: null,
+                birthDate: null
+                
+            },
+            methods: {
+                saveProfile: function() {
+                    this.toggleLoader = true;
+                    let payload = {
+                        specialId: this.specialId,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
+                        shortDescription: this.shortDescription,
+                        address: {
+                            country: this.country,
+                            city: this.city
+                        },
+                        media: {
+                            music: this.music,
+                            video: this.video
+                        }
+                    }
+                    axios.post('https://www.diary-api.somee.com/api/profile/create', payload)
+                        .then(res => {
+                            this.toggleLoader = false;
+                            return location.href = "../content/profile.html"
+                        })
+                        .catch(err => console.error(err));
+                }
+            },
+            mounted:  async function() {
+                let local = JSON.parse(localStorage.diaryAppWebTech);
+                this.specialId =  local.userId
+               if(!localStorage.diaryAppWebTech) return location.href = "../index.html";
+            }
+        })
+    </script>
+</body>
+</html>
