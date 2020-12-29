@@ -77,7 +77,7 @@
                     }
                     console.log(payload);
                     axios.post(this.baseURL+'api/diary/create', payload)
-                        .then(res => location.href = "timeline.html")
+                        .then(res => location.href = "../vue-cdn-diary-app/content/timeline.html")
                         .catch(err => console.error(err));
                 }
             },
