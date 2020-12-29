@@ -45,7 +45,7 @@
                             <button type="submit" class="uk-button uk-button-primary">Create</button>
                         </div>
                         <div class="d-grid gap-2 mt-2">
-                            <button type="button" class="uk-button uk-button-default" @click="redirectToFeed">Sign in instead</button>
+                            <button type="button" class="uk-button uk-button-default" @click="redirectToLogin">Sign in instead</button>
                         </div>
                    </form>
                 </div>
@@ -73,7 +73,7 @@
                 user: {} 
             },
             methods: {
-                redirectToFeed: function() {
+                redirectToLogin: function() {
                     location.href = '../index.html';
                 },
                 register: async function() {
@@ -106,7 +106,7 @@
                 }
             },
             mounted: function() {
-                if(localStorage.diaryAppWebTech) location.href = '../vue-cdn-diary-app/content/profile.html';
+                if(localStorage.diaryAppWebTech) location.href = 'profile.html';
             }
         })
     </script>

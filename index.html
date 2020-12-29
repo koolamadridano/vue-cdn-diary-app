@@ -47,7 +47,7 @@
                             </button>
                         </div>
                         <div class="d-grid gap-2 mt-2">
-                            <button type="button" class="uk-button uk-button-default" @click="redirectToFeed">Create new account</button>
+                            <button type="button" class="uk-button uk-button-default" @click="redirectToCreate">Create new account</button>
                         </div> 
                    </form>
                 </div>
@@ -75,7 +75,7 @@
                 user: {} 
             },
             methods: {
-                redirectToFeed: function() {
+                redirectToCreate: function() {
                     location.href = 'content/registration.html';
                 },
                 login: async function() {
@@ -102,7 +102,7 @@
                 }
             },
             mounted: function() {
-                if(localStorage.diaryAppWebTech)  location.href = '../vue-cdn-diary-app/content/profile.html';
+                if(localStorage.diaryAppWebTech)  location.href = '../content/profile.html';
             }
         })
     </script>
