@@ -145,7 +145,7 @@
                     axios.post('https://www.diary-api.somee.com/api/profile/create', payload)
                         .then(res => {
                             this.toggleLoader = false;
-                            return location.href = "../content/profile.html"
+                            return location.href = "profile.html"
                         })
                         .catch(err => console.error(err));
                 }

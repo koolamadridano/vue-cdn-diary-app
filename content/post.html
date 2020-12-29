@@ -65,18 +65,19 @@
              
             methods: {
                 returnToProfile: function() {
-                    location.href = '../content/profile.html';
+                    location.href = 'profile.html';
                 },
                 postDiary: function(){
                     let payload = {
                         specialId: this.local.userId,
                         category: this.diaryPayload.category,
                         content: this.diaryPayload.content,
-                        datePosted: moment(Date.now()).add(24, 'hours').format('LLL')
+                        datePosted: moment(Date.now()).format('LLL'),
+                        //datePosted: moment(Date.now()).add(24, 'hours').format('LLL')
                     }
                     console.log(payload);
                     axios.post(this.baseURL+'api/diary/create', payload)
-                        .then(res => location.href = "../content/timeline.html")
+                        .then(res => location.href = "timeline.html")
                         .catch(err => console.error(err));
                 }
             },

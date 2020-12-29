@@ -101,17 +101,17 @@
                     return location.href = "../index.html";
                 }, 
                 redirectToPostPage: function() {
-                    return location.href = "../content/post.html";
+                    return location.href = "post.html";
                 },
                 redirectToFeed: function() {
-                    return location.href = "../content/timeline.html";
+                    return location.href = "timeline.html";
                 },
                 componentDidMount: async function() {
                     if(this.local.userId) {
                         await axios.get(`${this.baseURL}api/profile/findBySpecialId/${this.local?.userId}`)
                             .then(res => {
                                 this.user = res.data;
-                                if(this.user.length == 0) return location.href = "../content/editprofile.html";
+                                if(this.user.length == 0) return location.href = "editprofile.html";
                                 document.title = this.user[0]?.firstName + " " + this.user[0]?.lastName;
                                 
                                 let youtubeVideoUrl = this.user[0]?.media.video;
